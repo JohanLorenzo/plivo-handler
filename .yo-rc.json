@@ -3,7 +3,7 @@
     "insertRoutes": true,
     "registerRoutesFile": "server/routes.js",
     "routesNeedle": "// Insert routes below",
-    "routesBase": "/api/",
+    "routesBase": "/api/v1",
     "pluralizeRoutes": true,
     "insertSockets": true,
     "registerSocketsFile": "server/config/socketio.js",
