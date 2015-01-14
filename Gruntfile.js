@@ -12,11 +12,7 @@ module.exports = function (grunt) {
   // Load grunt tasks automatically, when needed
   require('jit-grunt')(grunt, {
     express: 'grunt-express-server',
-    useminPrepare: 'grunt-usemin',
-    ngtemplates: 'grunt-angular-templates',
-    cdnify: 'grunt-google-cdn',
     protractor: 'grunt-protractor-runner',
-    injector: 'grunt-asset-injector',
     buildcontrol: 'grunt-build-control'
   });
 
@@ -30,7 +26,6 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON('package.json'),
     yeoman: {
       // configurable paths
-      client: require('./bower.json').appPath || 'client',
       dist: 'dist'
     },
     express: {
@@ -51,24 +46,10 @@ module.exports = function (grunt) {
     },
     open: {
       server: {
-        url: 'http://localhost:<%= express.options.port %>'
+        url: 'http://localhost:<%= express.options.port %>/api/'
       }
     },
     watch: {
-      injectJS: {
-        files: [
-          '<%= yeoman.client %>/{app,components}/**/*.js',
-          '!<%= yeoman.client %>/{app,components}/**/*.spec.js',
-          '!<%= yeoman.client %>/{app,components}/**/*.mock.js',
-          '!<%= yeoman.client %>/app/app.js'],
-        tasks: ['injector:scripts']
-      },
-      injectCss: {
-        files: [
-          '<%= yeoman.client %>/{app,components}/**/*.css'
-        ],
-        tasks: ['injector:css']
-      },
       mochaTest: {
         files: ['server/**/*.spec.js'],
         tasks: ['env:test', 'mochaTest']
@@ -78,7 +59,7 @@ module.exports = function (grunt) {
           '<%= yeoman.client %>/{app,components}/**/*.spec.js',
           '<%= yeoman.client %>/{app,components}/**/*.mock.js'
         ],
-        tasks: ['newer:jshint:all', 'karma']
+        tasks: ['newer:jshint:all']
       },
       gruntfile: {
         files: ['Gruntfile.js']
@@ -159,21 +140,6 @@ module.exports = function (grunt) {
       server: '.tmp'
     },
 
-    // Add vendor prefixed styles
-    autoprefixer: {
-      options: {
-        browsers: ['last 1 version']
-      },
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '.tmp/',
-          src: '{,*/}*.css',
-          dest: '.tmp/'
-        }]
-      }
-    },
-
     // Debugging with node inspector
     'node-inspector': {
       custom: {
@@ -208,15 +174,6 @@ module.exports = function (grunt) {
       }
     },
 
-    // Automatically inject Bower components into the app
-    wiredep: {
-      target: {
-        src: '<%= yeoman.client %>/index.html',
-        ignorePath: '<%= yeoman.client %>/',
-        exclude: [/bootstrap-sass-official/, /bootstrap.js/, '/json3/', '/es5-shim/']
-      }
-    },
-
     // Renames files for browser caching purposes
     rev: {
       dist: {
@@ -231,21 +188,8 @@ module.exports = function (grunt) {
       }
     },
 
-    // Reads HTML for usemin blocks to enable smart builds that automatically
-    // concat, minify and revision files. Creates configurations in memory so
-    // additional tasks can operate on them
-    useminPrepare: {
-      html: ['<%= yeoman.client %>/index.html'],
-      options: {
-        dest: '<%= yeoman.dist %>/public'
-      }
-    },
-
     // Performs rewrites based on rev and the useminPrepare configuration
     usemin: {
-      html: ['<%= yeoman.dist %>/public/{,*/}*.html'],
-      css: ['<%= yeoman.dist %>/public/{,*/}*.css'],
-      js: ['<%= yeoman.dist %>/public/{,*/}*.js'],
       options: {
         assetsDirs: [
           '<%= yeoman.dist %>/public',
@@ -280,54 +224,6 @@ module.exports = function (grunt) {
           src: '{,*/}*.svg',
           dest: '<%= yeoman.dist %>/public/assets/images'
         }]
-      }
-    },
-
-    // Allow the use of non-minsafe AngularJS files. Automatically makes it
-    // minsafe compatible so Uglify does not destroy the ng references
-    ngAnnotate: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '.tmp/concat',
-          src: '*/**.js',
-          dest: '.tmp/concat'
-        }]
-      }
-    },
-
-    // Package all the html partials into a single javascript payload
-    ngtemplates: {
-      options: {
-        // This should be the name of your apps angular module
-        module: 'plivoHandlerApp',
-        htmlmin: {
-          collapseBooleanAttributes: true,
-          collapseWhitespace: true,
-          removeAttributeQuotes: true,
-          removeEmptyAttributes: true,
-          removeRedundantAttributes: true,
-          removeScriptTypeAttributes: true,
-          removeStyleLinkTypeAttributes: true
-        },
-        usemin: 'app/app.js'
-      },
-      main: {
-        cwd: '<%= yeoman.client %>',
-        src: ['{app,components}/**/*.html'],
-        dest: '.tmp/templates.js'
-      },
-      tmp: {
-        cwd: '.tmp',
-        src: ['{app,components}/**/*.html'],
-        dest: '.tmp/tmp-templates.js'
-      }
-    },
-
-    // Replace Google CDN references
-    cdnify: {
-      dist: {
-        html: ['<%= yeoman.dist %>/public/*.html']
       }
     },
 
@@ -413,13 +309,6 @@ module.exports = function (grunt) {
     },
 
     // Test settings
-    karma: {
-      unit: {
-        configFile: 'karma.conf.js',
-        singleRun: true
-      }
-    },
-
     mochaTest: {
       options: {
         reporter: 'spec'
@@ -448,51 +337,7 @@ module.exports = function (grunt) {
         NODE_ENV: 'production'
       },
       all: localConfig
-    },
-
-    injector: {
-      options: {
-
-      },
-      // Inject application script files into index.html (doesn't include bower)
-      scripts: {
-        options: {
-          transform: function(filePath) {
-            filePath = filePath.replace('/client/', '');
-            filePath = filePath.replace('/.tmp/', '');
-            return '<script src="' + filePath + '"></script>';
-          },
-          starttag: '<!-- injector:js -->',
-          endtag: '<!-- endinjector -->'
-        },
-        files: {
-          '<%= yeoman.client %>/index.html': [
-              ['{.tmp,<%= yeoman.client %>}/{app,components}/**/*.js',
-               '!{.tmp,<%= yeoman.client %>}/app/app.js',
-               '!{.tmp,<%= yeoman.client %>}/{app,components}/**/*.spec.js',
-               '!{.tmp,<%= yeoman.client %>}/{app,components}/**/*.mock.js']
-            ]
-        }
-      },
-
-      // Inject component css into index.html
-      css: {
-        options: {
-          transform: function(filePath) {
-            filePath = filePath.replace('/client/', '');
-            filePath = filePath.replace('/.tmp/', '');
-            return '<link rel="stylesheet" href="' + filePath + '">';
-          },
-          starttag: '<!-- injector:css -->',
-          endtag: '<!-- endinjector -->'
-        },
-        files: {
-          '<%= yeoman.client %>/index.html': [
-            '<%= yeoman.client %>/{app,components}/**/*.css'
-          ]
-        }
-      }
-    },
+    }
   });
 
   // Used for delaying livereload until after server has restarted
@@ -521,9 +366,6 @@ module.exports = function (grunt) {
         'clean:server',
         'env:all',
         'concurrent:server',
-        'injector',
-        'wiredep',
-        'autoprefixer',
         'concurrent:debug'
       ]);
     }
@@ -532,9 +374,6 @@ module.exports = function (grunt) {
       'clean:server',
       'env:all',
       'concurrent:server',
-      'injector',
-      'wiredep',
-      'autoprefixer',
       'express:dev',
       'wait',
       'open',
@@ -560,10 +399,7 @@ module.exports = function (grunt) {
       return grunt.task.run([
         'clean:server',
         'env:all',
-        'concurrent:test',
-        'injector',
-        'autoprefixer',
-        'karma'
+        'concurrent:test'
       ]);
     }
 
@@ -573,9 +409,6 @@ module.exports = function (grunt) {
         'env:all',
         'env:test',
         'concurrent:test',
-        'injector',
-        'wiredep',
-        'autoprefixer',
         'express:dev',
         'protractor'
       ]);
@@ -590,17 +423,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean:dist',
     'concurrent:dist',
-    'injector',
-    'wiredep',
-    'useminPrepare',
-    'autoprefixer',
-    'ngtemplates',
-    'concat',
-    'ngAnnotate',
     'copy:dist',
-    'cdnify',
-    'cssmin',
-    'uglify',
     'rev',
     'usemin'
   ]);
