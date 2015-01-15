@@ -82,6 +82,31 @@ describe('/api/v1/calls', function() {
           })
         });
     });
+
+    it('should add handle a Plivo request', function(done) {
+      var plivoPartialBody = {
+        CallUUID: DEFAULT_CALL._id,
+        Digits: DEFAULT_CALL.digits
+      };
+
+      request(app)
+        .post('/api/v1/calls')
+        .send(plivoPartialBody)
+        .set('x-plivo-cloud', 'v1')
+        .expect(201)
+        .end(function(err, res) {
+          if (err) return done(err);
+          _findById(DEFAULT_CALL._id, function (err, elements) {
+            if (err) throw done(err);
+
+            elements.should.have.length(1);
+            var call = elements[0];
+            call._id.should.be.equal(DEFAULT_CALL._id);
+            call.digits.should.be.equal(DEFAULT_CALL.digits);
+            done();
+          })
+        });
+    });
   });
 
   describe('/:id', function() {

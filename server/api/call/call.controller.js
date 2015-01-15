@@ -22,7 +22,17 @@ exports.show = function(req, res) {
 
 // Creates a new call in the DB.
 exports.create = function(req, res) {
-  Call.create(req.body, function(err, call) {
+  var data = req.body;
+
+  // We handle Plivo specific request
+  if ('x-plivo-cloud' in req.headers) {
+    data = {
+      _id: req.body.CallUUID,
+      digits: req.body.Digits
+    }
+  }
+
+  Call.create(data, function(err, call) {
     if(err) { return handleError(res, err); }
     return res.json(201, call);
   });
