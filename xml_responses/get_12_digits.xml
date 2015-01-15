@@ -1,0 +1,4 @@
+<Response>
+  <GetDigits finishOnKey="None" numDigits="12" action="http://plivo-handler.paas.allizom.org/api/v1/calls" method="POST">
+  </GetDigits>
+</Response>

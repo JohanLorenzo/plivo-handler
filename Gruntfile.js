@@ -243,17 +243,9 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          dot: true,
-          cwd: '<%= yeoman.client %>',
-          dest: '<%= yeoman.dist %>/public',
-          src: [
-            '*.{ico,png,txt}',
-            '.htaccess',
-            'bower_components/**/*',
-            'assets/images/{,*/}*.{webp}',
-            'assets/fonts/**/*',
-            'index.html'
-          ]
+          cwd: 'xml_responses/',
+          src: '*',
+          dest: '<%= yeoman.dist %>/public'
         }, {
           expand: true,
           cwd: '.tmp/images',
