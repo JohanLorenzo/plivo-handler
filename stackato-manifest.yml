@@ -1,0 +1,16 @@
+applications:
+- name: plivo-handler
+  mem: 128M
+  disk: 1G
+  framework:
+    name: node
+  runtime: node010
+  url: plivo-handler.paas.allizom.org
+  env:
+    NODE_ENV: production
+  services:
+    plivo-handler-db:
+      type: mongodb
+  stackato:
+    processes:
+      web: node server/app.js

@@ -229,6 +229,17 @@ module.exports = function (grunt) {
 
     // Copies remaining files to places other tasks can use
     copy: {
+      packagejson: {
+        dest: '<%= yeoman.dist %>/',
+        src: 'package.json',
+        options: {
+          process: function (content, srcpath) {
+            var json = JSON.parse(content);
+            delete json["devDependencies"];
+            return JSON.stringify(json);
+          }
+        }
+      },
       dist: {
         files: [{
           expand: true,
@@ -251,10 +262,14 @@ module.exports = function (grunt) {
         }, {
           expand: true,
           dest: '<%= yeoman.dist %>',
-          src: [
-            'package.json',
-            'server/**/*'
-          ]
+          src: 'server/**/*'
+        }, {
+          expand: true,
+          dest: '<%= yeoman.dist %>/',
+          src: 'stackato-manifest.yml',
+          rename: function(dest, src) {
+            return dest + src.replace('stackato-', '');
+          }
         }]
       },
       styles: {
@@ -424,6 +439,7 @@ module.exports = function (grunt) {
     'clean:dist',
     'concurrent:dist',
     'copy:dist',
+    'copy:packagejson',
     'rev',
     'usemin'
   ]);
