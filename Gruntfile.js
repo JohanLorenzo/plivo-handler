@@ -54,28 +54,8 @@ module.exports = function (grunt) {
         files: ['server/**/*.spec.js'],
         tasks: ['env:test', 'mochaTest']
       },
-      jsTest: {
-        files: [
-          '<%= yeoman.client %>/{app,components}/**/*.spec.js',
-          '<%= yeoman.client %>/{app,components}/**/*.mock.js'
-        ],
-        tasks: ['newer:jshint:all']
-      },
       gruntfile: {
         files: ['Gruntfile.js']
-      },
-      livereload: {
-        files: [
-          '{.tmp,<%= yeoman.client %>}/{app,components}/**/*.css',
-          '{.tmp,<%= yeoman.client %>}/{app,components}/**/*.html',
-          '{.tmp,<%= yeoman.client %>}/{app,components}/**/*.js',
-          '!{.tmp,<%= yeoman.client %>}{app,components}/**/*.spec.js',
-          '!{.tmp,<%= yeoman.client %>}/{app,components}/**/*.mock.js',
-          '<%= yeoman.client %>/assets/images/{,*//*}*.{png,jpg,jpeg,gif,webp,svg}'
-        ],
-        options: {
-          livereload: true
-        }
       },
       express: {
         files: [
@@ -91,10 +71,6 @@ module.exports = function (grunt) {
 
     // Make sure code styles are up to par and there are no obvious mistakes
     jshint: {
-      options: {
-        jshintrc: '<%= yeoman.client %>/.jshintrc',
-        reporter: require('jshint-stylish')
-      },
       server: {
         options: {
           jshintrc: 'server/.jshintrc'
@@ -110,17 +86,6 @@ module.exports = function (grunt) {
         },
         src: ['server/**/*.spec.js']
       },
-      all: [
-        '<%= yeoman.client %>/{app,components}/**/*.js',
-        '!<%= yeoman.client %>/{app,components}/**/*.spec.js',
-        '!<%= yeoman.client %>/{app,components}/**/*.mock.js'
-      ],
-      test: {
-        src: [
-          '<%= yeoman.client %>/{app,components}/**/*.spec.js',
-          '<%= yeoman.client %>/{app,components}/**/*.mock.js'
-        ]
-      }
     },
 
     // Empties folders to start fresh
@@ -188,45 +153,6 @@ module.exports = function (grunt) {
       }
     },
 
-    // Performs rewrites based on rev and the useminPrepare configuration
-    usemin: {
-      options: {
-        assetsDirs: [
-          '<%= yeoman.dist %>/public',
-          '<%= yeoman.dist %>/public/assets/images'
-        ],
-        // This is so we update image references in our ng-templates
-        patterns: {
-          js: [
-            [/(assets\/images\/.*?\.(?:gif|jpeg|jpg|png|webp|svg))/gm, 'Update the JS to reference our revved images']
-          ]
-        }
-      }
-    },
-
-    // The following *-min tasks produce minified files in the dist folder
-    imagemin: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '<%= yeoman.client %>/assets/images',
-          src: '{,*/}*.{png,jpg,jpeg,gif}',
-          dest: '<%= yeoman.dist %>/public/assets/images'
-        }]
-      }
-    },
-
-    svgmin: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '<%= yeoman.client %>/assets/images',
-          src: '{,*/}*.svg',
-          dest: '<%= yeoman.dist %>/public/assets/images'
-        }]
-      }
-    },
-
     // Copies remaining files to places other tasks can use
     copy: {
       packagejson: {
@@ -263,12 +189,6 @@ module.exports = function (grunt) {
             return dest + src.replace('stackato-', '');
           }
         }]
-      },
-      styles: {
-        expand: true,
-        cwd: '<%= yeoman.client %>',
-        dest: '.tmp/',
-        src: ['{app,components}/**/*.css']
       }
     },
 
@@ -308,11 +228,7 @@ module.exports = function (grunt) {
         options: {
           logConcurrentOutput: true
         }
-      },
-      dist: [
-        'imagemin',
-        'svgmin'
-      ]
+      }
     },
 
     // Test settings
@@ -402,14 +318,6 @@ module.exports = function (grunt) {
       ]);
     }
 
-    else if (target === 'client') {
-      return grunt.task.run([
-        'clean:server',
-        'env:all',
-        'concurrent:test'
-      ]);
-    }
-
     else if (target === 'e2e') {
       return grunt.task.run([
         'clean:server',
@@ -422,18 +330,15 @@ module.exports = function (grunt) {
     }
 
     else grunt.task.run([
-      'test:server',
-      'test:client'
+      'test:server'
     ]);
   });
 
   grunt.registerTask('build', [
     'clean:dist',
-    'concurrent:dist',
     'copy:dist',
     'copy:packagejson',
-    'rev',
-    'usemin'
+    'rev'
   ]);
 
   grunt.registerTask('default', [
